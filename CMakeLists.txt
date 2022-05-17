@@ -22,6 +22,6 @@ set(SFML_DIR "C:\\SFML(32)\\lib\\cmake\\SFML")
 find_package(SFML 2.5 COMPONENTS graphics audio REQUIRED)
 
 
-add_executable(Chip_8_Emulator main.cpp chip.h graphics.h)
+add_executable(Chip_8_Emulator src/main.cpp src/chip.h src/graphics.h)
 target_link_libraries(Chip_8_Emulator sfml-graphics sfml-audio)
 add_definitions(-DSDL_MAIN_HANDLED)
