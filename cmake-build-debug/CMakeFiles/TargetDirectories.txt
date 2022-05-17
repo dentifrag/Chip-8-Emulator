@@ -1,0 +1,3 @@
+C:/Users/wagne/CLionProjects/Chip-8 Emulator/cmake-build-debug/CMakeFiles/Chip_8_Emulator.dir
+C:/Users/wagne/CLionProjects/Chip-8 Emulator/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/wagne/CLionProjects/Chip-8 Emulator/cmake-build-debug/CMakeFiles/rebuild_cache.dir
