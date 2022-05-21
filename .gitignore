@@ -86,3 +86,4 @@ ROM/INVADERS.ch8
 ROM/IBM_Logo.ch8
 ROM/chip8-test-rom.ch8
 ROM/c8_test.ch8
+*.ch8
