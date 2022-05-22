@@ -49,7 +49,7 @@ public:
     byte memory[MEM_SIZE]{};
     byte display[64 * 32]{};
     bool drawFlag = false;
-    stack<twobytes> chipStack[16]{};
+    twobytes chipStack[16]{};
     byte stackPointer{};
     byte keypad[HEX_SIZE]{};
     twobytes programCounter{};

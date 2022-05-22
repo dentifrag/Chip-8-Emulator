@@ -11,8 +11,11 @@ void Chip::getNextInstruction(){
     programCounter += 2;
 }
 void Chip::initializeMemory(){
+    memset(memory, false, sizeof(memory));
+    memset(display, false, sizeof(display));
+    memset(chipStack, false, sizeof(chipStack));
     // ROMS start loading at 0x200
-    programCounter = 0x200;
+    programCounter = 0x200u;
     opcode = 0;
     indexRegister = 0;
     stackPointer = 0;
@@ -33,7 +36,7 @@ void Chip::initializeMemory(){
 }
 
 void Chip::loadRom() {
-    ifstream ROM("../ROM/test_opcode.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/BC_test.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
@@ -63,13 +66,13 @@ void Chip::emulateCycle(){
     switch (opcode & 0xF000u) {
         case 0x0000:{
             switch (opcode) {
-                default:{
-                    cout << "Unknown opcode " << opcode;
-                    break;
-                }
-                case 0x0000: {
-                    break;
-                }
+//                default:{
+//                    cout << "Unknown opcode " << opcode;
+//                    break;
+//                }
+//                case 0x0000: {
+//                    break;
+//                }
                 case 0x00E0:{
                     cout<<"clearing"<< endl;
                     memset(display, false, sizeof(display));
@@ -77,31 +80,31 @@ void Chip::emulateCycle(){
                 }
                 case 0x00EE:{
                     stackPointer --;
-                    programCounter = chipStack->top();
+                    programCounter = chipStack[stackPointer];
                     break;
                 }
             }
             break;
         }
         case 0x1000: {
-            programCounter = opcode & 0x0FFF;
+            programCounter = opcode & 0x0FFFu;
             break;
 
         }
         case 0x2000: {
-            chipStack->push(programCounter);
-            stackPointer += 1;
-            programCounter = opcode & 0x0FFF;
+            chipStack[stackPointer] = programCounter;
+            stackPointer ++;
+            programCounter = opcode & 0x0FFFu;
             break;
         }
         case 0x3000: {
-            if (V[getNibble(opcode,8)] == (opcode & 0x00FF)){
+            if (V[getNibble(opcode,8)] == (opcode & 0x00FFu)){
                 programCounter += 2;
             }
             break;
         }
         case 0x4000: {
-            if (V[getNibble(opcode,8)] != (opcode & 0x00FF)){
+            if (V[getNibble(opcode,8)] != (opcode & 0x00FFu)){
                 programCounter += 2;
             }break;
         }
@@ -112,11 +115,11 @@ void Chip::emulateCycle(){
             break;
         }
         case 0x6000: {
-            V[getNibble(opcode,8)] = opcode & 0x00FF;
+            V[getNibble(opcode,8)] = opcode & 0x00FFu;
             break;
         }
         case 0x7000: {
-            V[getNibble(opcode,8)] += opcode & 0x00FF;
+            V[getNibble(opcode,8)] += opcode & 0x00FFu;
             break;
         }
         case 0x8000: {
@@ -139,7 +142,7 @@ void Chip::emulateCycle(){
                 }
 
                 case 0x0004: {
-                    if (V[getNibble(opcode,4)] > (0xFF - V[getNibble(opcode,8)])){
+                    if ((V[getNibble(opcode,4)] + V[getNibble(opcode,8)]) > 0xFFu){
                         V[0xF] = 1;
                     } else {
                         V[0xF] = 0;
@@ -189,11 +192,11 @@ void Chip::emulateCycle(){
             break;
         }
         case 0xA000: {
-            indexRegister = (opcode & 0x0FFF);
+            indexRegister = (opcode & 0x0FFFu);
             break;
         }
         case 0xB000: {
-            programCounter += (opcode & 0x0FFF) + V[0];
+            programCounter += (opcode & 0x0FFFu) + V[0];
             // this opcode isn't used very often
             break;
         }
@@ -204,7 +207,7 @@ void Chip::emulateCycle(){
         case 0xD000: {
             // DXYN
             uint8_t pixel;
-            uint8_t height = opcode & 0x000F;
+            uint8_t height = opcode & 0x000Fu;
             uint8_t vX = V[getNibble(opcode,8)];
             uint8_t vY = V[getNibble(opcode,4)];
 
@@ -229,44 +232,47 @@ void Chip::emulateCycle(){
             break;
         }
         case 0xF000: {
-            case 0x0007: {
-                V[getNibble(opcode,8)] = delayTimer;
-                break;
-            }
-            case 0x0015: {
-                delayTimer = V[getNibble(opcode,8)];
-                break;
-            }
-            case 0x0018: {
-                soundTimer = V[getNibble(opcode,8)];
-                break;
-            }
-            case 0x001E: {
-                indexRegister += V[getNibble(opcode,8)];
-                break;
-            }
-            case 0x0029: {
-                indexRegister = V[getNibble(opcode,8)] * 0x5;
-                break;
-            }
-            case 0x0033: {
-                memory[indexRegister] = V[getNibble(opcode,8)] / 100;
-                memory[indexRegister + 1] = (V[getNibble(opcode,8)] /10) % 10;
-                memory[indexRegister + 2] = (V[getNibble(opcode,8)] %10) % 10;
-                break;
-            }
-            case 0x0055: {
-                for (int i = 0; i <= V[getNibble(opcode,8)] ; i++) {
-                    memory[indexRegister + i] = V[i];
+            switch (opcode & 0x00FFu) {
+                case 0x0007: {
+                    V[getNibble(opcode, 8)] = delayTimer;
+                    break;
                 }
-                break;
-            }
-            case 0x0065: {
-                for (int i = 0; i <= getNibble(opcode,8); i++) {
-                    V[i] = memory[indexRegister + i];
+                case 0x0015: {
+                    delayTimer = V[getNibble(opcode, 8)];
+                    break;
                 }
-                break;
+                case 0x0018: {
+                    soundTimer = V[getNibble(opcode, 8)];
+                    break;
+                }
+                case 0x001E: {
+                    indexRegister += V[getNibble(opcode, 8)];
+                    break;
+                }
+                case 0x0029: {
+                    indexRegister = V[getNibble(opcode, 8)] * 0x5;
+                    break;
+                }
+                case 0x0033: {
+                    memory[indexRegister] = V[getNibble(opcode, 8)] / 100;
+                    memory[indexRegister + 1] = (V[getNibble(opcode, 8)] / 10) % 10;
+                    memory[indexRegister + 2] = (V[getNibble(opcode, 8)] % 10) % 10;
+                    break;
+                }
+                case 0x0055: {
+                    for (int i = 0; i <= V[getNibble(opcode, 8)]; i++) {
+                        memory[indexRegister + i] = V[i];
+                    }
+                    break;
+                }
+                case 0x0065: {
+                    for (int i = 0; i <= getNibble(opcode, 8); i++) {
+                        V[i] = memory[indexRegister + i];
+                    }
+                    break;
+                }
             }
+                    break;
         }
 
             // TODO

@@ -18,6 +18,7 @@ int main() {
     Chip c;
     c.initializeMemory();
     c.loadRom();
+    cout << "This is 3DC " << hex << c.memory[0x3DC] + 0<< "\n";
     while(true){
 
         while(window.isOpen()){
