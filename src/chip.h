@@ -47,9 +47,9 @@ public:
     byte V[REG_SIZE]{};
 // Roms to be loaded after address 0x200
     byte memory[MEM_SIZE]{};
-    byte display[64 * 32]{};
+    byte display[SCR_SIZE]{};
     bool drawFlag = false;
-    twobytes chipStack[16]{};
+    twobytes chipStack[STK_SIZE]{};
     byte stackPointer{};
     byte keypad[HEX_SIZE]{};
     twobytes pc{};

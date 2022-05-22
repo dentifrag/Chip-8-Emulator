@@ -36,7 +36,7 @@ void Chip::initializeMemory(){
 }
 
 void Chip::loadRom() {
-    ifstream ROM("../ROM/test_opcode.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/INVADERS.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
@@ -61,7 +61,7 @@ void Chip::emulateCycle(){
     opcode <<=8;
     opcode |=  memory[pc + 1];
     cout << hex << uppercase << opcode<< endl;
-
+    getNextInstruction();
     // using bitwise &s to mask off bits to extract parts of opcodes
     switch (opcode & 0xF000u) {
         case 0x0000:{
@@ -287,7 +287,6 @@ void Chip::emulateCycle(){
 //                    }
 //                }
     }
-    getNextInstruction();
 }
 
 
