@@ -52,7 +52,7 @@ public:
     twobytes chipStack[16]{};
     byte stackPointer{};
     byte keypad[HEX_SIZE]{};
-    twobytes programCounter{};
+    twobytes pc{};
     twobytes indexRegister{};
     twobytes opcode{};
     byte delayTimer = 0x00;

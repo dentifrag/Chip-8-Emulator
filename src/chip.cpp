@@ -8,14 +8,14 @@
 #include<windows.h>
 
 void Chip::getNextInstruction(){
-    programCounter += 2;
+    pc += 2;
 }
 void Chip::initializeMemory(){
     memset(memory, false, sizeof(memory));
     memset(display, false, sizeof(display));
     memset(chipStack, false, sizeof(chipStack));
     // ROMS start loading at 0x200
-    programCounter = 0x200u;
+    pc = 0x200u;
     opcode = 0;
     indexRegister = 0;
     stackPointer = 0;
@@ -36,7 +36,7 @@ void Chip::initializeMemory(){
 }
 
 void Chip::loadRom() {
-    ifstream ROM("../ROM/BC_test.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/test_opcode.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
@@ -57,9 +57,9 @@ void Chip::dumpMemory() {
 
 void Chip::emulateCycle(){
     // Fetch opcode
-    opcode = memory[programCounter];
+    opcode = memory[pc];
     opcode <<=8;
-    opcode |=  memory[programCounter + 1];
+    opcode |=  memory[pc + 1];
     cout << hex << uppercase << opcode<< endl;
 
     // using bitwise &s to mask off bits to extract parts of opcodes
@@ -80,37 +80,37 @@ void Chip::emulateCycle(){
                 }
                 case 0x00EE:{
                     stackPointer --;
-                    programCounter = chipStack[stackPointer];
+                    pc = chipStack[stackPointer];
                     break;
                 }
             }
             break;
         }
         case 0x1000: {
-            programCounter = opcode & 0x0FFFu;
+            pc = opcode & 0x0FFFu;
             break;
 
         }
         case 0x2000: {
-            chipStack[stackPointer] = programCounter;
+            chipStack[stackPointer] = pc;
             stackPointer ++;
-            programCounter = opcode & 0x0FFFu;
+            pc = opcode & 0x0FFFu;
             break;
         }
         case 0x3000: {
             if (V[getNibble(opcode,8)] == (opcode & 0x00FFu)){
-                programCounter += 2;
+                pc += 2;
             }
             break;
         }
         case 0x4000: {
             if (V[getNibble(opcode,8)] != (opcode & 0x00FFu)){
-                programCounter += 2;
+                pc += 2;
             }break;
         }
         case 0x5000: {
             if (V[getNibble(opcode,8)] == V[getNibble(opcode,4)]){
-                programCounter += 2;
+                pc += 2;
             }
             break;
         }
@@ -179,6 +179,7 @@ void Chip::emulateCycle(){
                 }
                 case 0x000E: {
                     V[0xF] = V[getNibble(opcode,8)] >> 7;
+                    cout << hex << V[0xF]<< " The bit \n";
                     V[getNibble(opcode,8)] <<= 1;
                     break;
                 }
@@ -187,7 +188,7 @@ void Chip::emulateCycle(){
         }
         case 0x9000: {
             if(V[getNibble(opcode,8)] != V[getNibble(opcode,4)]){
-                programCounter += 2;
+                pc += 2;
             }
             break;
         }
@@ -196,7 +197,7 @@ void Chip::emulateCycle(){
             break;
         }
         case 0xB000: {
-            programCounter += (opcode & 0x0FFFu) + V[0];
+            pc += (opcode & 0x0FFFu) + V[0];
             // this opcode isn't used very often
             break;
         }
