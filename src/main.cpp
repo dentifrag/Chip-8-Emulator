@@ -9,13 +9,12 @@ using namespace sf;
 #pragma clang diagnostic push
 #pragma ide diagnostic ignored "EndlessLoop"
 
-int main() {
+int main(int argc, char **argv) {
 
     RenderWindow window(VideoMode(640, 320), "Chip 8", Style::Titlebar | Style::Close);
     window.setFramerateLimit(144);
     Event ev{};
     RectangleShape pixel(Vector2f(10, 10));
-
     Chip c;
     c.initializeMemory();
     c.loadRom();
@@ -130,17 +129,14 @@ int main() {
                         }
                         case  sf::Keyboard::X:{
                             c.keypad[0x0] = false;
-                            cout << "X is pushed";
                             break;
                         }
                         case  sf::Keyboard::C:{
                             c.keypad[0xB] = false;
-                            cout << "X is pushed";
                             break;
                         }
                         case  sf::Keyboard::V:{
                             c.keypad[0xF] = false;
-                            cout << "X is pushed";
                             break;
                         }
                     }

@@ -40,7 +40,7 @@ int Chip::getNibble(uint16_t code, int bitShift) {
 
 
 void Chip::loadRom() {
-    ifstream ROM("../ROM/c8_test.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/TETRIS.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
@@ -241,13 +241,13 @@ void Chip::emulateCycle(){
             switch (opcode & 0x00FF) {
 
                 case 0x009E: {
-                       if (keypad[V[getNibble(opcode, 8)]] != 0){
-                           pc += 2;
-                       }
+                    if (keypad[V[getNibble(opcode, 8)]] != 0) {
+                        pc += 2;
+                    }
                     break;
                 }
                 case 0x00A1: {
-                    if (keypad[V[getNibble(opcode, 8)]] == 0){
+                    if (keypad[V[getNibble(opcode, 8)]] == 0) {
                         pc += 2;
                     }
                 }
@@ -272,6 +272,22 @@ void Chip::emulateCycle(){
                     indexRegister += V[getNibble(opcode, 8)];
                     break;
                 }
+
+                case 0x000A: {
+                    bool key_pushed = false;
+
+                    for (int i = 0; i < 16; i++) {
+                        if (keypad[i] != 0) {
+                            V[getNibble(opcode, 8)] = i;
+                            key_pushed = true;
+                        }
+                    }
+                    if (!key_pushed) {
+                        return;
+                    }
+                    break;
+                }
+
                 case 0x0029: {
                     indexRegister = V[getNibble(opcode, 8)] * 0x5;
                     break;
@@ -298,16 +314,6 @@ void Chip::emulateCycle(){
                     break;
         }
 
-            // TODO
-//            case 0xE000: {
-//                switch(opcode & 0x000F) {
-//                    case 0x009E: {
-//                        break;
-//                    }
-//                    case 0x00A1:{
-//                        break;
-//                    }
-//                }
     }
 }
 
