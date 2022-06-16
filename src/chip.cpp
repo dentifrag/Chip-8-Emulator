@@ -7,6 +7,7 @@
 #include "fstream"
 #include<windows.h>
 
+
 void Chip::getNextInstruction(){
     pc += 2;
 }
@@ -24,7 +25,9 @@ void Chip::initializeMemory(){
         memory[i] = fonts[i];
     }
 }
-   int Chip::getNibble(uint16_t code, int bitShift) {
+
+
+int Chip::getNibble(uint16_t code, int bitShift) {
     int value {};
     if (bitShift == 8) {
         value = ((code & 0xF00) >> 8);
@@ -35,8 +38,9 @@ void Chip::initializeMemory(){
     return value;
 }
 
+
 void Chip::loadRom() {
-    ifstream ROM("../ROM/INVADERS.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/test_opcode.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
@@ -232,6 +236,24 @@ void Chip::emulateCycle(){
             drawFlag = true;
             break;
         }
+        
+        case 0xE000: {
+            switch (opcode & 0x00FF) {
+
+                case 0x009E: {
+                    if (keypad[V[getNibble(opcode, 8)]] != 0) {
+                        pc += 2;
+                    }
+                    break;
+                }
+                case 0x00A1: {
+                    if (keypad[V[getNibble(opcode, 8)]] == 0) {
+                        pc += 2;
+                    }
+                }
+            }
+        }
+        
         case 0xF000: {
             switch (opcode & 0x00FFu) {
                 case 0x0007: {
@@ -250,6 +272,22 @@ void Chip::emulateCycle(){
                     indexRegister += V[getNibble(opcode, 8)];
                     break;
                 }
+
+                case 0x000A: {
+                    bool key_pushed = false;
+
+                    for (int i = 0; i < 16; i++) {
+                        if (keypad[i] != 0) {
+                            V[getNibble(opcode, 8)] = i;
+                            key_pushed = true;
+                        }
+                    }
+                    if (!key_pushed) {
+                        return;
+                    }
+                    break;
+                }
+
                 case 0x0029: {
                     indexRegister = V[getNibble(opcode, 8)] * 0x5;
                     break;
@@ -276,16 +314,6 @@ void Chip::emulateCycle(){
                     break;
         }
 
-            // TODO
-//            case 0xE000: {
-//                switch(opcode & 0x000F) {
-//                    case 0x009E: {
-//                        break;
-//                    }
-//                    case 0x00A1:{
-//                        break;
-//                    }
-//                }
     }
 }
 
