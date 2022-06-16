@@ -40,7 +40,7 @@ int Chip::getNibble(uint16_t code, int bitShift) {
 
 
 void Chip::loadRom() {
-    ifstream ROM("../ROM/TETRIS.ch8", ios::in | ios::binary);
+    ifstream ROM("../ROM/test_opcode.ch8", ios::in | ios::binary);
     char byte;
     if (ROM.is_open()) {
         for (int i = 0x200; ROM.get(byte) ; i++){
